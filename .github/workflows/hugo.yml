@@ -1,4 +1,6 @@
-name: Product's Home
+name: Hugo
+run-name: Hugo (${{ github.event.inputs.family }} - ${{ github.event.inputs.environment }})
+
 on:
   workflow_dispatch:
     inputs:
