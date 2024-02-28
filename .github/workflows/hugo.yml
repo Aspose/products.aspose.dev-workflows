@@ -31,8 +31,13 @@ jobs:
           hugo-version: 'latest'
           extended: true
 
-    - name: Build
-      run: hugo --config "configs/common.toml,configs/${{ github.event.inputs.family }}.toml" --minify --templateMetrics --templateMetricsHints --enableGitInfo
+    - name: Build (home)
+      if: ${{ github.event.inputs.family == 'home' }}
+      run: hugo --config "configs/common.toml,configs/home.toml" -b "https://products.aspose.dev/" --minify --templateMetrics --templateMetricsHints --enableGitInfo
+
+    - name: Build (${{ github.event.inputs.family }})
+      if: ${{ github.event.inputs.family != 'home' }}
+      run: hugo --config "configs/common.toml,configs/${{ github.event.inputs.family }}.toml" -b "https://products.aspose.dev/${{ github.event.inputs.family }}/" --minify --templateMetrics --templateMetricsHints --enableGitInfo
 
     - name: Deploy to S3
       run: hugo deploy --config "configs/${{ github.event.inputs.family }}.toml" --maxDeletes 0 --target "${{ github.event.inputs.environment }}" --force
