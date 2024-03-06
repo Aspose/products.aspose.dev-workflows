@@ -1,5 +1,5 @@
 name: Hugo
-run-name: Hugo (${{ github.event.inputs.family }} - ${{ github.event.inputs.environment }})
+run-name: Hugo (${{ github.event.inputs.environment }})
 
 on:
   workflow_dispatch:
@@ -9,12 +9,7 @@ on:
         type: environment
         default: staging
         required: true
-      family:
-        description: 'Product Family'
-        type: choice
-        default: home
-        required: true
-        options: [ home, pdf, cells ]
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -31,16 +26,11 @@ jobs:
           hugo-version: 'latest'
           extended: true
 
-    - name: Build (home)
-      if: ${{ github.event.inputs.family == 'home' }}
+    - name: Build
       run: hugo --config "configs/common.toml,configs/home.toml" -b "https://products.aspose.dev/" --minify --templateMetrics --templateMetricsHints --enableGitInfo
 
-    - name: Build (${{ github.event.inputs.family }})
-      if: ${{ github.event.inputs.family != 'home' }}
-      run: hugo --config "configs/common.toml,configs/${{ github.event.inputs.family }}.toml" -b "https://products.aspose.dev/${{ github.event.inputs.family }}/" --minify --templateMetrics --templateMetricsHints --enableGitInfo
-
     - name: Deploy to S3
-      run: hugo deploy --config "configs/${{ github.event.inputs.family }}.toml" --maxDeletes 0 --target "${{ github.event.inputs.environment }}" --force
+      run: hugo deploy --config "configs/home.toml" --maxDeletes 0 --target "${{ github.event.inputs.environment }}" --force
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
